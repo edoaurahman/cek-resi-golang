@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/gin-gonic/gin"
 )
 
 func spxTrackingNumber(resi string) string {
-	k := "MGViZmZmZTYzZDJhNDgxY2Y1N2ZlN2Q1ZWJkYzlmZDY="
+	k := os.Getenv("SPX_TOKEN")
 	r := float64(time.Now().UnixNano() / int64(time.Millisecond) / 1e3)
 	h := sha256.New()
 	rs := fmt.Sprintf("%d", int64(r))
@@ -19,6 +20,7 @@ func spxTrackingNumber(resi string) string {
 	return fmt.Sprintf(resi+"|"+rs+"%x", h.Sum(nil))
 }
 
+// Spx expeditions
 func SpxExpedition(c *gin.Context, resi string) {
 	trackingNum := spxTrackingNumber(resi)
 

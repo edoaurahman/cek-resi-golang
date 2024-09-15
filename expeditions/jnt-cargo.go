@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
+// Jnt Cargo Expeditions
 func JntCargoExpedition(c *gin.Context, resi string) {
 	url := "https://office.jtcargo.co.id/official/waybill/trackingCustomerByWaybillNo"
 	method := "POST"
