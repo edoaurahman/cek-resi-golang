@@ -54,10 +54,10 @@ func JntExpedition(c *gin.Context, resi string) {
 		return
 	}
 
-	response(c, res, body)
+	responseJnt(c, res, body)
 }
 
-func response(c *gin.Context, res *http.Response, body []byte) {
+func responseJnt(c *gin.Context, res *http.Response, body []byte) {
 	var response models.Response
 	var model models.JntModel
 
