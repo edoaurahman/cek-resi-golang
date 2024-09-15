@@ -2,10 +2,12 @@ package expeditions
 
 import (
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"spx-tracker/models"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -47,5 +49,27 @@ func SpxExpedition(c *gin.Context, resi string) {
 		return
 	}
 
-	c.Data(resp.StatusCode, "application/json", responseData)
+	responseSpx(c, resp, responseData)
+}
+
+func responseSpx(c *gin.Context, res *http.Response, body []byte) {
+	var response models.Response
+	var model models.SpxModel
+
+	err := json.Unmarshal([]byte(body), &model)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membaca data respons dari API SPX.id"})
+		return
+	}
+
+	response.Resi = model.Data.SlsTrackingNumber
+	response.Expedition = "SPX"
+	for _, detail := range model.Data.TrackingList {
+		response.Details = append(response.Details, models.Details{
+			Time:    time.Unix(int64(detail.Timestamp), 0),
+			Message: detail.Message,
+		})
+	}
+
+	c.JSON(res.StatusCode, response)
 }

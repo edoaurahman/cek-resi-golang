@@ -1,10 +1,13 @@
 package expeditions
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"spx-tracker/models"
 	"strings"
+	"time"
 
 	"github.com/gin-gonic/gin"
 )
@@ -42,5 +45,34 @@ func JntCargoExpedition(c *gin.Context, resi string) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membaca data respons dari API J&T Cargo"})
 		return
 	}
-	c.Data(res.StatusCode, "application/json", body)
+
+	responseJntCargo(c, res, body)
+}
+
+func responseJntCargo(c *gin.Context, res *http.Response, body []byte) {
+	var response models.Response
+	var model models.JntCargoModel
+	err := json.Unmarshal([]byte(body), &model)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memparsing data respons dari API J&T Cargo"})
+		return
+	}
+
+	response.Resi = model.Data[0].Keyword
+	response.Expedition = "J&T Cargo"
+	timeFormat := "2006-01-02 15:04:05"
+	for _, detail := range model.Data[0].Details {
+		parsedTime, err := time.Parse(timeFormat, detail.ScanTime)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal memparsing waktu dari API J&T Cargo"})
+			return
+		}
+		response.Details = append(response.Details, models.Details{
+			Time:    parsedTime,
+			Message: detail.CustomerTracking,
+		})
+	}
+
+	c.JSON(res.StatusCode, response)
 }

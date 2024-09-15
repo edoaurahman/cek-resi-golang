@@ -1,9 +1,11 @@
 package expeditions
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"net/http"
+	"spx-tracker/models"
 	"strings"
 
 	"github.com/gin-gonic/gin"
@@ -51,5 +53,29 @@ func JntExpedition(c *gin.Context, resi string) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membaca data respons dari API J&T"})
 		return
 	}
-	c.Data(res.StatusCode, "application/json", body)
+
+	responseJnt(c, res, body)
+}
+
+func responseJnt(c *gin.Context, res *http.Response, body []byte) {
+	var response models.Response
+	var model models.JntModel
+
+	err := json.Unmarshal([]byte(body), &model)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membaca data respons dari API J&T"})
+		return
+	}
+
+	response.Resi = model.Data.TrackingDirect[0].ReferenceNo
+	response.Expedition = "J&T"
+	for _, detail := range model.Data.TrackingDirect[0].Details {
+		response.Details = append(response.Details, models.Details{
+			Time:    detail.Datetime,
+			Message: detail.LogisticStatus.Description,
+		})
+	}
+
+	c.JSON(res.StatusCode, response)
 }
