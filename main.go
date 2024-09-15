@@ -19,7 +19,6 @@ func main() {
 	r.GET("/cekresi", func(c *gin.Context) {
 		resi := c.Query("sls_tracking_number")
 		expedition := c.Query("type")
-		fmt.Println(expedition)
 		if resi == "" {
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Parameter 'sls_tracking_number' harus diisi"})
 			return
@@ -30,6 +29,8 @@ func main() {
 			expeditions.SpxExpedition(c, resi)
 		case "jnt-cargo":
 			expeditions.JntCargoExpedition(c, resi)
+		case "jnt":
+			expeditions.JntExpedition(c, resi)
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Expedisi tidak dikenal"})
 		}
