@@ -3,15 +3,19 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"spx-tracker/expeditions"
 
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	inisialization()
 	gin.SetMode(gin.ReleaseMode)
 	r := gin.Default()
-
+	port := os.Getenv("PORT")
+	fmt.Println("Server is running on port", port)
 	r.GET("/cekresi", func(c *gin.Context) {
 		resi := c.Query("sls_tracking_number")
 		expedition := c.Query("type")
@@ -32,5 +36,18 @@ func main() {
 
 	})
 
-	r.Run(":3000") // Ganti dengan port yang sesuai dengan kebutuhan Anda
+	r.Run(":" + port)
+}
+
+// initialization function
+func inisialization() {
+	LoadEnv()
+}
+
+func LoadEnv() {
+	err := godotenv.Load(".env")
+
+	if err != nil {
+		fmt.Println("Error loading .env file")
+	}
 }
