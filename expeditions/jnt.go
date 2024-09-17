@@ -61,16 +61,17 @@ func responseJnt(c *gin.Context, res *http.Response, body []byte) {
 	var response models.Response
 	var model models.JntModel
 
-	err := json.Unmarshal([]byte(body), &model)
-
-	if err != nil {
+	if err := json.Unmarshal(body, &model); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Gagal membaca data respons dari API J&T"})
 		return
 	}
 
 	response.Resi = model.Data.TrackingDirect[0].ReferenceNo
 	response.Expedition = "J&T"
-	for _, detail := range model.Data.TrackingDirect[0].Details {
+
+	details := model.Data.TrackingDirect[0].Details
+	for i := len(details) - 1; i >= 0; i-- {
+		detail := details[i]
 		response.Details = append(response.Details, models.Details{
 			Time:    detail.Datetime,
 			Message: detail.LogisticStatus.Description,
