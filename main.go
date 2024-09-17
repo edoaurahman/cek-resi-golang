@@ -31,6 +31,8 @@ func main() {
 			expeditions.JntCargoExpedition(c, resi)
 		case "jnt":
 			expeditions.JntExpedition(c, resi)
+		case "tokopedia":
+			expeditions.TokopediaKurirRekomendasi(c, resi)
 		default:
 			c.JSON(http.StatusBadRequest, gin.H{"error": "Expedisi tidak dikenal"})
 		}
