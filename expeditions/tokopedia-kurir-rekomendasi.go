@@ -11,7 +11,7 @@ import (
 )
 
 func TokopediaKurirRekomendasi(c *gin.Context, resi string) {
-	url := "https://orchestra.tokopedia.com/orc/v1/microsite/tracking?airwaybill=TKP01-T2N41R80"
+	url := "https://orchestra.tokopedia.com/orc/v1/microsite/tracking?airwaybill=" + resi
 	method := "GET"
 
 	client := &http.Client{}
